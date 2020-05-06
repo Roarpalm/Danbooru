@@ -1,17 +1,18 @@
-import requests, os, threading
+import requests, os, threading, datetime
 from time import time
 from lxml import etree
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from dateutil.relativedelta import relativedelta
 
 class Spider():
-    def __init__(self):
+    def __init__(self, x):
         self.header = {'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
         self.ids = []
         self.good_ids = []
         self.srcs = []
         self.page = range(1, 101) # 页数
-        self.date = '2020-04' # 月份
+        self.date = x # 月份
         self.dir_path = os.path.abspath('.') + os.sep + self.date + '_' + str(self.page[0]) + '~' + str(self.page[-1]) + os.sep
         self.n = 0
         self.run()
@@ -96,5 +97,17 @@ class Spider():
         self.download()
         print(f'用时{int((time()-start) // 60)}分{int((time()-start) % 60)}秒')
 
+def month_list(begin_date, end_date):
+    date_list = []
+    begin_date = datetime.datetime.strptime(begin_date, "%Y-%m")
+    end_date = datetime.datetime.strptime(end_date, "%Y-%m")
+    while begin_date <= end_date:
+        date_str = begin_date.strftime("%Y-%m")
+        date_list.append(date_str)
+        begin_date += relativedelta(months=1)
+    
+    for x in date_list:
+        Spider(x)
+
 if __name__ == "__main__":
-    Spider()
+    month_list('2020-04', '2020-05')
