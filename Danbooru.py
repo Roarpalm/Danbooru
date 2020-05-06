@@ -17,7 +17,7 @@ class Spider():
         self.run()
 
     def get_id(self):
-        '''爬取id'''
+        '''爬取'''
         def main(i):
             print('正在爬取第' + str(i) + '页')
             if i == 1:
@@ -57,6 +57,7 @@ class Spider():
             os.makedirs(self.dir_path)
 
     def save(self):
+        '''保存'''
         with open('ids.txt', 'r+') as f:
             old = f.read().splitlines()
             f.write(self.date + '_' + str(self.page[0]) + '~' + str(self.page[-1]) + '\n')
@@ -77,8 +78,7 @@ class Spider():
                 file_name = self.dir_path + str(self.n) + '.mp4'
             if src.split('.')[-1] == 'webm':
                 file_name = self.dir_path + str(self.n) + '.webm'
-                
-            response = requests.get(src, headers=self.header, stream=True)
+            response = requests.get(src, headers=self.header)
             with open(file_name, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
