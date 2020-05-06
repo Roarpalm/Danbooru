@@ -1,7 +1,6 @@
 import requests, os, threading
-from time import time, sleep
+from time import time
 from lxml import etree
-from tqdm import tqdm
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 
@@ -96,7 +95,6 @@ class Spider():
         self.new_dir()
         self.download()
         print(f'用时{int((time()-start) // 60)}分{int((time()-start) % 60)}秒')
-
 
 if __name__ == "__main__":
     Spider()
