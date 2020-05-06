@@ -11,15 +11,15 @@ class Spider():
         self.ids = []
         self.good_ids = []
         self.srcs = []
-        self.page = range(1, 31) # 页数
-        self.date = '2020-03' # 月份
-        self.dir_path = os.path.abspath('.') + os.sep + self.date + '_' + str(self.page[0]) + '~' + (str(self.page[-1])) + os.sep
+        self.page = range(1, 101) # 页数
+        self.date = '2020-04' # 月份
+        self.dir_path = os.path.abspath('.') + os.sep + self.date + '_' + str(self.page[0]) + '~' + str(self.page[-1]) + os.sep
         self.n = 0
         self.run()
 
     def get_id(self):
         '''爬取id'''
-        for i in self.page:
+        def main(i):
             print('正在爬取第' + str(i) + '页')
             if i == 1:
                 url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-29&scale=month'
@@ -34,6 +34,9 @@ class Spider():
                 id_ = i.get('alt')
                 id_ = id_.split('#')[-1]
                 self.ids.append(id_)
+        
+        with ThreadPoolExecutor(max_workers=8) as e:
+            [e.submit(main, i) for i in self.page]
 
     def get_src(self):
         '''解析'''
@@ -46,7 +49,7 @@ class Spider():
             src = tree.xpath('//*[@id="image"]/@src')[-1]
             self.srcs.append(src)
 
-        with ThreadPoolExecutor(max_workers=4) as e:
+        with ThreadPoolExecutor(max_workers=8) as e:
             [e.submit(main, id_) for id_ in self.good_ids]
 
     def new_dir(self):
@@ -57,6 +60,7 @@ class Spider():
     def save(self):
         with open('ids.txt', 'r+') as f:
             old = f.read().splitlines()
+            f.write(self.date + '_' + str(self.page[0]) + '~' + str(self.page[-1]) + '\n')
             for i in self.ids:
                 if i not in old:
                     f.write(i + '\n')
@@ -81,7 +85,7 @@ class Spider():
                     f.write(chunk)
             print(f'第{str(a)}张图片下载完成')
 
-        with ThreadPoolExecutor(max_workers=4) as e:
+        with ThreadPoolExecutor(max_workers=8) as e:
             [e.submit(main, src) for src in self.srcs]
             
     def run(self):
