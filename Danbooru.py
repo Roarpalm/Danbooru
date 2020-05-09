@@ -22,9 +22,9 @@ class Spider():
         def main(i):
             print('正在爬取第' + str(i) + '页')
             if i == 1:
-                url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-29&scale=month'
+                url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-01&scale=month'
             else:
-                url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-29&page={i}&scale=month'
+                url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-01&page={i}&scale=month'
 
             response = requests.get(url, headers=self.header)
             html = response.content.decode()
@@ -59,6 +59,9 @@ class Spider():
 
     def save(self):
         '''保存'''
+        if not os.path.exists('ids.txt'):
+            e = open('ids.txt', 'a')
+            e.close()
         with open('ids.txt', 'r+') as f:
             old = f.read().splitlines()
             f.write(self.date + '_' + str(self.page[0]) + '~' + str(self.page[-1]) + '\n')
@@ -110,4 +113,4 @@ def month_list(begin_date, end_date):
         Spider(x)
 
 if __name__ == "__main__":
-    month_list('2020-01', '2020-02')
+    month_list('2005-07', '2020-05')

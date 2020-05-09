@@ -1,8 +1,6 @@
 [https://danbooru.donmai.us](https://danbooru.donmai.us) 爬虫，批量下载排行榜
 
 ## Danbooru.py
-更改 ```self.date``` 即为月份
-
 更改 ```self.page``` 即为页数
 
 使用 ```requests``` 库
