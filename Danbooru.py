@@ -1,4 +1,5 @@
 import requests, os, threading, datetime
+from requests import adapters
 from time import time
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -8,6 +9,8 @@ from dateutil.relativedelta import relativedelta
 class Spider():
     def __init__(self, x):
         self.header = {'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36'}
+        self.session = requests.Session()
+        self.session.mount('https://danbooru.donmai.us', adapters.HTTPAdapter(pool_connections=1, pool_maxsize=8))
         self.ids = []
         self.good_ids = []
         self.srcs = []
@@ -26,7 +29,7 @@ class Spider():
             else:
                 url = f'https://danbooru.donmai.us/explore/posts/popular?date={self.date}-01&page={i}&scale=month'
 
-            response = requests.get(url, headers=self.header)
+            response = self.session.get(url, headers=self.header)
             html = response.content.decode()
             bf = BeautifulSoup(html, 'lxml')
             alt = bf.find_all('img', {'class':'has-cropped-true'})
@@ -43,7 +46,7 @@ class Spider():
         def main(id_):
             url = 'https://danbooru.donmai.us/posts/' + id_
             print('正在解析：' + url)
-            response = requests.get(url, headers=self.header)
+            response = self.session.get(url, headers=self.header)
             html = response.content.decode()
             tree = etree.HTML(html)
             src = tree.xpath('//*[@id="image"]/@src')[-1]
@@ -82,7 +85,7 @@ class Spider():
                 file_name = self.dir_path + str(self.n) + '.mp4'
             if src.split('.')[-1] == 'webm':
                 file_name = self.dir_path + str(self.n) + '.webm'
-            response = requests.get(src, headers=self.header)
+            response = self.session.get(src, headers=self.header)
             with open(file_name, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
@@ -113,4 +116,4 @@ def month_list(begin_date, end_date):
         Spider(x)
 
 if __name__ == "__main__":
-    month_list('2005-07', '2020-05')
+    month_list('2020-04', '2020-04')
